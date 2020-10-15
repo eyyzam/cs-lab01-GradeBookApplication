@@ -166,6 +166,8 @@ namespace GradeBook.GradeBooks
                     case EnrollmentType.International:
                         internationalPoints += student.AverageGrade;
                         break;
+                    default:
+	                    throw new ArgumentOutOfRangeException();
                 }
 
                 switch (student.Type)
@@ -179,40 +181,43 @@ namespace GradeBook.GradeBooks
                     case StudentType.DualEnrolled:
                         dualEnrolledPoints += student.AverageGrade;
                         break;
+                    default:
+	                    throw new ArgumentOutOfRangeException();
                 }
             }
 
-            // #todo refactor into it's own method with calculations performed here
             Console.WriteLine("Average Grade of all students is " + (allStudentsPoints / Students.Count));
             if (campusPoints != 0)
-                Console.WriteLine("Average for only local students is " + (campusPoints / Students.Where(e => e.Enrollment == EnrollmentType.Campus).Count()));
+                Console.WriteLine("Average for only local students is " + (campusPoints / Students.Count(e => e.Enrollment == EnrollmentType.Campus)));
             if (statePoints != 0)
-                Console.WriteLine("Average for only state students (excluding local) is " + (statePoints / Students.Where(e => e.Enrollment == EnrollmentType.State).Count()));
+                Console.WriteLine("Average for only state students (excluding local) is " + (statePoints / Students.Count(e => e.Enrollment == EnrollmentType.State)));
             if (nationalPoints != 0)
-                Console.WriteLine("Average for only national students (excluding state and local) is " + (nationalPoints / Students.Where(e => e.Enrollment == EnrollmentType.National).Count()));
+                Console.WriteLine("Average for only national students (excluding state and local) is " + (nationalPoints / Students.Count(e => e.Enrollment == EnrollmentType.National)));
             if (internationalPoints != 0)
-                Console.WriteLine("Average for only international students is " + (internationalPoints / Students.Where(e => e.Enrollment == EnrollmentType.International).Count()));
+                Console.WriteLine("Average for only international students is " + (internationalPoints / Students.Count(e => e.Enrollment == EnrollmentType.International)));
             if (standardPoints != 0)
-                Console.WriteLine("Average for students excluding honors and dual enrollment is " + (standardPoints / Students.Where(e => e.Type == StudentType.Standard).Count()));
+                Console.WriteLine("Average for students excluding honors and dual enrollment is " + (standardPoints / Students.Count(e => e.Type == StudentType.Standard)));
             if (honorPoints != 0)
-                Console.WriteLine("Average for only honors students is " + (honorPoints / Students.Where(e => e.Type == StudentType.Honors).Count()));
+                Console.WriteLine("Average for only honors students is " + (honorPoints / Students.Count(e => e.Type == StudentType.Honors)));
             if (dualEnrolledPoints != 0)
-                Console.WriteLine("Average for only dual enrolled students is " + (dualEnrolledPoints / Students.Where(e => e.Type == StudentType.DualEnrolled).Count()));
+                Console.WriteLine("Average for only dual enrolled students is " + (dualEnrolledPoints / Students.Count(e => e.Type == StudentType.DualEnrolled)));
         }
 
         public virtual void CalculateStudentStatistics(string name)
         {
-            var student = Students.FirstOrDefault(e => e.Name == name);
-            student.LetterGrade = GetLetterGrade(student.AverageGrade);
-            student.GPA = GetGPA(student.LetterGrade, student.Type);
+	        var student = Students.FirstOrDefault(e => e.Name == name);
+	        if (student == null) return;
+	        student.LetterGrade = GetLetterGrade(student.AverageGrade);
+	        student.GPA = GetGPA(student.LetterGrade, student.Type);
 
-            Console.WriteLine("{0} ({1}:{2}) GPA: {3}.", student.Name, student.LetterGrade, student.AverageGrade, student.GPA);
-            Console.WriteLine();
-            Console.WriteLine("Grades:");
-            foreach (var grade in student.Grades)
-            {
-                Console.WriteLine(grade);
-            }
+	        Console.WriteLine("{0} ({1}:{2}) GPA: {3}.", student.Name, student.LetterGrade, student.AverageGrade,
+		        student.GPA);
+	        Console.WriteLine();
+	        Console.WriteLine("Grades:");
+	        foreach (var grade in student.Grades)
+	        {
+		        Console.WriteLine(grade);
+	        }
         }
 
         public virtual char GetLetterGrade(double averageGrade)
@@ -255,10 +260,7 @@ namespace GradeBook.GradeBooks
                 gradeBookType = "Base";
             else
             {
-                if (string.IsNullOrEmpty(gradeBookType))
-                    gradeBookType = "Standard";
-                else
-                    gradeBookType = Enum.GetName(gradebookEnum, int.Parse(gradeBookType));
+	            gradeBookType = string.IsNullOrEmpty(gradeBookType) ? "Standard" : Enum.GetName(gradebookEnum ?? throw new InvalidOperationException(), int.Parse(gradeBookType));
             }
 
             // Get GradeBook from the GradeBook.GradeBooks namespace

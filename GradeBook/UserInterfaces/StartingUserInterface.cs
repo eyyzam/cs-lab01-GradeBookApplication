@@ -5,14 +5,14 @@ namespace GradeBook.UserInterfaces
 {
     public static class StartingUserInterface
     {
-        public static bool Quit = false;
+	    public static bool Quit;
         public static void CommandLoop()
         {
             while (!Quit)
             {
                 Console.WriteLine(string.Empty);
                 Console.WriteLine(">> What would you like to do?");
-                var command = Console.ReadLine().ToLower();
+                var command = Console.ReadLine()?.ToLower();
                 CommandRoute(command);
             }
         }
@@ -23,12 +23,18 @@ namespace GradeBook.UserInterfaces
                 CreateCommand(command);
             else if (command.StartsWith("load"))
                 LoadCommand(command);
-            else if (command == "help")
-                HelpCommand();
-            else if (command == "quit")
-                Quit = true;
-            else
-                Console.WriteLine("{0} was not recognized, please try again.", command);
+            switch (command)
+            {
+                case "help":
+                    HelpCommand();
+                    break;
+                case "quit":
+	                Quit = true;
+	                break;
+                default:
+	                Console.WriteLine("{0} was not recognized, please try again.", command);
+	                break;
+            }
         }
 
         public static void CreateCommand(string command)

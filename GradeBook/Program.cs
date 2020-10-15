@@ -3,9 +3,9 @@ using GradeBook.UserInterfaces;
 
 namespace GradeBook
 {
-    class Program
+	internal class Program
     {
-        static void Main(string[] args)
+	    private static void Main()
         {
             Console.WriteLine("#=======================#");
             Console.WriteLine("# Welcome to GradeBook! #");

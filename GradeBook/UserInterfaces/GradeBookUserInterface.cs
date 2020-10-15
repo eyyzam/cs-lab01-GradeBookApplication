@@ -7,7 +7,7 @@ namespace GradeBook.UserInterfaces
     public static class GradeBookUserInterface
     {
         public static BaseGradeBook GradeBook;
-        public static bool Quit = false;
+        public static bool Quit;
         public static void CommandLoop(BaseGradeBook gradeBook)
         {
             GradeBook = gradeBook;
@@ -21,7 +21,7 @@ namespace GradeBook.UserInterfaces
             {
                 Console.WriteLine(string.Empty);
                 Console.WriteLine(">> What would you like to do?");
-                var command = Console.ReadLine().ToLower();
+                var command = Console.ReadLine()?.ToLower();
                 CommandRoute(command);
             }
 
@@ -30,9 +30,8 @@ namespace GradeBook.UserInterfaces
 
         public static void CommandRoute(string command)
         {
-            if (command == "save")
-                SaveCommand();
-            else if (command.StartsWith("addgrade"))
+            
+            if (command.StartsWith("addgrade"))
                 AddGradeCommand(command);
             else if (command.StartsWith("removegrade"))
                 RemoveGradeCommand(command);
@@ -40,18 +39,29 @@ namespace GradeBook.UserInterfaces
                 AddStudentCommand(command);
             else if (command.StartsWith("remove"))
                 RemoveStudentCommand(command);
-            else if (command == "list")
-                ListCommand();
-            else if (command == "statistics all")
-                StatisticsCommand();
             else if (command.StartsWith("statistics"))
-                StudentStatisticsCommand(command);
-            else if (command == "help")
-                HelpCommand();
-            else if (command == "close")
-                Quit = true;
-            else
-                Console.WriteLine("{0} was not recognized, please try again.", command);
+	            StudentStatisticsCommand(command);
+            switch (command)
+            {
+                case "list":
+	                ListCommand();
+	                break;
+                case "statistics all":
+	                StatisticsCommand();
+	                break;
+                case "save":
+	                SaveCommand();
+	                break;
+                case "help":
+	                HelpCommand();
+	                break;
+                case "close":
+	                Quit = true;
+	                break;
+                default:
+	                Console.WriteLine("{0} was not recognized, please try again.", command);
+	                break;
+            }
         }
 
         public static void SaveCommand()
@@ -69,7 +79,7 @@ namespace GradeBook.UserInterfaces
                 return;
             }
             var name = parts[1];
-            var score = Double.Parse(parts[2]);
+            var score = double.Parse(parts[2]);
             GradeBook.AddGrade(name, score);
             Console.WriteLine("Added a score of {0} to {1}'s grades", score, name);
         }
@@ -83,7 +93,7 @@ namespace GradeBook.UserInterfaces
                 return;
             }
             var name = parts[1];
-            var score = Double.Parse(parts[2]);
+            var score = double.Parse(parts[2]);
             GradeBook.RemoveGrade(name, score);
             Console.WriteLine("Removed a score of {0} from {1}'s grades", score, name);
         }
@@ -98,15 +108,13 @@ namespace GradeBook.UserInterfaces
             }
             var name = parts[1];
 
-            StudentType studentType;
-            if (!Enum.TryParse(parts[2], true, out studentType))
+            if (!Enum.TryParse(parts[2], true, out StudentType studentType))
             {
                 Console.WriteLine("{0} is not a valid student type, try again.", parts[2]);
                 return;
             }
 
-            EnrollmentType enrollmentType;
-            if (!Enum.TryParse(parts[3], true, out enrollmentType))
+            if (!Enum.TryParse(parts[3], true, out EnrollmentType enrollmentType))
             {
                 Console.WriteLine("{0} is not a valid enrollment type, try again.", parts[3]);
                 return;
