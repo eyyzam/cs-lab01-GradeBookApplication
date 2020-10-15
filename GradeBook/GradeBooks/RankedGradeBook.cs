@@ -26,16 +26,15 @@ namespace GradeBook.GradeBooks
 			// List of obtainable grades
 			var obtainableGrades = new List<char>() {'A', 'B', 'C', 'D', 'F'};
 
-			for (var i = 1; i < 5; i++)
+			for (var i = 1; i <= 4; i++)
 			{
 				// Each 20% gets set the specific grade
 				if (studentGrades[(oneFifth * i) - 1] <= averageGrade)
 				{
-					return obtainableGrades[i];
+					return obtainableGrades.ElementAt(i- 1);
 				}
 			}
-
-			return base.GetLetterGrade(averageGrade);
+			return obtainableGrades.Last();
 		}
 
 		public override void CalculateStatistics()
